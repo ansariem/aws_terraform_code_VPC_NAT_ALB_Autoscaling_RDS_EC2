@@ -1,0 +1,11 @@
+variable "region" {}
+variable "aws_vpc_id" {}
+variable "instance1_id" {}
+variable "instance2_id" {}
+variable "subnet1" {}
+variable "subnet2" {}
+variable "subnet3" {}
+variable "instance3_id" {}
+variable "instance4_id" {}
+variable "instance5_id" {}
+variable "instance6_id" {}

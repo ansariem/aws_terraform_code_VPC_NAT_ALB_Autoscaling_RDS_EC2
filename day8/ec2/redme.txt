@@ -1,0 +1,22 @@
+
+The template_file data source renders a template from a template string, which is usually loaded from an external file.
+The template syntax is the same as for string templates in the main Terraform language, including interpolation sequences delimited with ${ ... }.
+ template = "${file("${path.module}/install_userdata.tpl")}"
+user_data              =  "${data.template_file.pkg_init.rendered}"
+
+The following attributes are exported:
+
+template - See Argument Reference above.
+vars - See Argument Reference above.
+rendered - The final rendered template.
+
+The following arguments are supported:
+
+template - (Required) The contents of the template. These can be loaded from a file on disk using the file() interpolation function.
+
+vars - (Optional) Variables for interpolation within the template. Note that variables must all be primitives. Direct references to lists or maps will cause a validation error.
+
+The following arguments are maintained for backwards compatibility and may be removed in a future version:
+
+filename - Deprecated, please use template instead. The filename for the template. Use path variables to make this path relative to different path roots.
+
