@@ -22,6 +22,46 @@ resource "aws_internet_gateway" "prod_gw" {
   }
 }
 
+/*To extend our VPC with this NAT-ed Private network, which required internt access from private instance:
+Required following resources VPC, public subnet, private subnet, NAT Gateway
+1. NAT Gateway should be available state.
+2. Created NAT Gateway on public subnet and Route table should have internet gateway
+3. Private subnet route table should have Nat gateway
+*/
+
+# Create a EIP for nat_gateway
+resource "aws_eip" "nat_gw_eip" {
+  vpc = true
+
+  tags = {
+    Name = "Web-EIP"
+  }
+}
+
+# Create NAT Gateway
+resource "aws_nat_gateway" "gw" {
+  allocation_id = "${aws_eip.nat_gw_eip.id}"
+  subnet_id     = "${aws_subnet.public_subnet.0.id}" # need to check
+
+  tags = {
+    Name = "Web-NGW"
+  }
+}
+
+# Private Route Table
+resource "aws_route_table" "prod_private" {
+  vpc_id = "${aws_vpc.prod_vpc.id}"
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = "${aws_nat_gateway.gw.id}"
+  }
+
+  tags = {
+    Name = "Prod-Private-NATED"
+  }
+}
+
 # Public Route Table
 resource "aws_route_table" "prod_public" {
   vpc_id = "${aws_vpc.prod_vpc.id}"
@@ -36,6 +76,7 @@ resource "aws_route_table" "prod_public" {
   }
 }
 
+/*
 # Private Route Table
 resource "aws_route_table" "prod_private" {
   vpc_id = "${aws_vpc.prod_vpc.id}"
@@ -48,8 +89,8 @@ resource "aws_route_table" "prod_private" {
   tags = {
     Name = "Private"
   }
-}
-#Public Subnet count.index (count = 0 )it will use  only use 2 availability zone
+}*/
+#Public Subnet count.index (count = 2 )it will use  only use 2 availability zone
 
 resource "aws_subnet" "public_subnet" {
   count                   = 2
